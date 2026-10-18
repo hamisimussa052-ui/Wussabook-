@@ -1,795 +1,897 @@
-<!DOCTYPE html>
-<html lang="sw">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1877f2">
-<title>WUSSABOOK</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#f0f2f5;color:#1c1e21;font-family:Arial,sans-serif}
-header{background:white;padding:12px 4%;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:5;box-shadow:0 1px 4px #ccc}
-.logo{font-size:25px;font-weight:bold;color:#1877f2}
-.search{width:35%;max-width:300px;padding:11px;border:0;border-radius:22px;background:#f0f2f5}
-nav{display:flex;justify-content:space-around;background:white;padding:12px 2%;border-bottom:1px solid #ddd;gap:5px}
-nav button{background:white;color:#65676b;border:0;padding:10px 5px;font-weight:bold;cursor:pointer}
-nav button:focus,nav button:hover{color:#1877f2}
-main{max-width:650px;margin:18px auto;padding:0 12px}
-.card{background:white;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px #ddd}
-h2{font-size:19px;margin:0 0 12px}
-.profile{display:flex;align-items:center;gap:10px}
-.avatar{background:#1877f2;color:white;width:43px;height:43px;border-radius:50%;display:grid;place-items:center;font-size:19px;font-weight:bold;flex-shrink:0}
-.muted{color:#65676b;font-size:13px}
-input,textarea{font:inherit}
-#postText{width:100%;border:0;background:#f0f2f5;padding:13px;border-radius:22px;resize:vertical;min-height:48px}
-.primary{background:#1877f2;color:white;border:0;padding:11px 17px;border-radius:7px;font-weight:bold;cursor:pointer}
-.actions{display:flex;gap:8px;margin-top:12px}
-.actions button{flex:1;padding:10px 4px;background:white;border:0;border-radius:7px;color:#606770;font-weight:bold;cursor:pointer}
-.actions button:hover{background:#f0f2f5}
-.story-row{display:flex;gap:12px;overflow-x:auto}
-.story{min-width:90px;height:115px;border-radius:12px;background:#e7f0ff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#1877f2;font-weight:bold;cursor:pointer}
-.post-content{white-space:pre-wrap;overflow-wrap:anywhere;margin:16px 0}
-#notice{color:#1877f2;margin-top:10px;font-size:14px}
-footer{text-align:center;color:#65676b;font-size:12px;padding:20px}
-.post-img{width:100%;max-height:400px;object-fit:cover;border-radius:8px;margin-top:10px}
-.page-section{display:none}
-.active-section{display:block}
-@media(max-width:420px){.logo{font-size:21px}.search{width:40%;font-size:12px}nav button{font-size:11px;padding:8px 2px}main{margin-top:12px}.card{padding:13px}}
-</style>
-  <link rel="manifest" href="manifest.json">
-</head>
-<body>
-<header>
-  <div class="logo">WUSSA<span style="color:#1c1e21">BOOK</span></div>
-  <input class="search" id="search" placeholder="Tafuta..." aria-label="Tafuta machapisho">
-</header>
-
-<nav>
-  <button onclick="showPage('home')">🏠 Home</button>
-  <button onclick="showPage('friends')">👥 Marafiki</button>
-  <button onclick="showPage('messages')">💬 Ujumbe</button>
-  <button onclick="showPage('notifications')">🔔 Taarifa</button>
-  <button onclick="showPage('account')">👤 Akaunti</button>
-  <button onclick="showPage('profile')">👤 Profile</button>
-</nav>
-
-<main>
-  <!-- HOME SECTION -->
-  <section id="home" class="page-section active-section">
-    <div class="card">
-      <h2>Stories</h2>
-      <div class="story-row">
-        <div class="story"><span style="font-size:28px">＋</span>Ongeza story</div>
-        <div class="story">🔵<span>WUSSA</span></div>
-        <div class="story">📸<span>Marafiki</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="profile">
-        <div class="avatar">W</div>
-        <div><strong>WUSSA</strong><div class="muted">Unawaza nini leo?</div></div>
-      </div>
-      <div style="margin-top:14px">
-        <textarea id="postText" placeholder="Una mawazo gani? Shiriki hapa..." rows="2"></textarea>
-      </div>
-      <div class="actions">
-        <button onclick="document.getElementById('photo').click()">📷 Picha</button>
-        <button class="primary" onclick="addPost()">Chapisha</button>
-      </div>
-      <input id="photo" type="file" accept="image/*" hidden onchange="previewImage(event)">
-      <div id="notice"></div>
-    </div>
-
-    <!-- SEHEMU YA MACHAPISHO (POSTS) -->
-    <div id="posts">
-      <div class="card">
-        <div class="profile">
-          <div class="avatar">W</div>
-          <div>
-            <strong>WUSSA Official</strong>
-            <div class="muted">Sasa hivi</div>
-          </div>
-        </div>
-        <div class="post-content">Karibu kwenye mtandao mpya wa Wussabook! 🚀</div>
-        <div class="actions" style="border-top:1px solid #eee; padding-top:8px">
-          <button onclick="this.style.color='#1877f2'">👍 Penda</button>
-          <button>💬 Maoni</button>
-          <button>🔄 Shiriki</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTIONS ZINGINE -->
-  
-  <section id="friends" class="page-section">
-    <div class="card">
-      <h2>👥 Marafiki wa WUSSABOOK</h2>
-      <p class="muted">Ongeza na tafuta marafiki kwenye orodha yako.</p>
-
-      <input id="friendSearch" type="search"
-        placeholder="Tafuta rafiki..."
-        oninput="renderWussaFriends()"
-        style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px">
-
-      <div style="margin-top:12px">
-        <input id="newFriendName" type="text" maxlength="50"
-          placeholder="Andika jina la rafiki"
-          style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px">
-        <button type="button" onclick="addWussaFriend()"
-          style="margin-top:8px;background:#1877f2;color:white;padding:10px;border:0;border-radius:8px">
-          ➕ Ongeza rafiki
-        </button>
-      </div>
-
-      <p id="friendStatus" class="muted"></p>
-      <h3>Orodha yangu ya marafiki</h3>
-      <div id="friendList"></div>
-    </div>
-  </section>
-
-
-  <section id="messages" class="page-section">
-    <div class="card">
-      <h2>Ujumbe (Chat)</h2>
-      <p class="muted">Hakuna jumbe mpya kwa sasa.</p>
-    </div>
-  </section>
-
-  <section id="notifications" class="page-section">
-    <div class="card">
-      <h2>Taarifa</h2>
-      <p class="muted">Hakuna taarifa mpya.</p>
-    </div>
-  </section>
-
-<section id="account" hidden>
-  <div class="card">
-    <h2>🔵 WUSSABOOK ACCOUNT</h2>
-    <p class="muted">Fungua akaunti yako ya majaribio au ingia.</p>
-    <div id="authStatus" role="status" aria-live="polite"></div>
-
-    <div class="actions">
-      <button type="button" onclick="authMode('register')">📝 Jisajili</button>
-      <button type="button" onclick="authMode('login')">🔑 Login</button>
-    </div>
-
-    <form id="registerForm">
-      <h2>Fungua akaunti</h2>
-      <label for="regName">Jina lako</label>
-      <input id="regName" required maxlength="50" autocomplete="name"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <label for="regEmail">Barua pepe</label>
-      <input id="regEmail" type="email" required maxlength="150" autocomplete="email"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <label for="regPass">Nywila (angalau herufi 8)</label>
-      <input id="regPass" type="password" required minlength="8" autocomplete="new-password"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <label for="regConfirm">Rudia nywila</label>
-      <input id="regConfirm" type="password" required minlength="8" autocomplete="new-password"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <button class="primary" type="submit" style="width:100%;margin-top:12px">Jisajili</button>
-    </form>
-
-    <form id="loginForm" hidden>
-      <h2>Ingia kwenye akaunti</h2>
-      <label for="loginEmail">Barua pepe</label>
-      <input id="loginEmail" type="email" required autocomplete="email"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <label for="loginPass">Nywila</label>
-      <input id="loginPass" type="password" required autocomplete="current-password"
-        style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-      <button class="primary" type="submit" style="width:100%;margin-top:12px">Login</button>
-    </form>
-
-    <div id="loggedIn" hidden>
-      <h2>Karibu WUSSABOOK! 🎉</h2>
-      <p id="welcomeName"></p>
-      <button class="primary" type="button" onclick="logoutDemo()">Toka kwenye akaunti</button>
-    </div>
-    <p class="muted">Toleo la majaribio kwenye kifaa hiki tu. Usitumie nywila yako halisi.</p>
-  </div>
-</section>
-
-
-<section id="profile" hidden>
-  <div class="card" id="WUSSABOOK_PROFILE">
-    <h2>👤 Profile yangu</h2>
-    <div style="text-align:center;padding:15px">
-      <img id="profilePhoto" alt="Picha ya wasifu"
-        style="width:100px;height:100px;border-radius:50%;object-fit:cover;background:#1877f2">
-      <h2 id="profileName">WUSSA</h2>
-      <p id="profileBio">Karibu kwenye WUSSABOOK!</p>
-    </div>
-
-    <label for="editName">Jina</label>
-    <input id="editName" maxlength="50" placeholder="Andika jina lako"
-      style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px">
-
-    <label for="editBio">Kuhusu mimi</label>
-    <textarea id="editBio" maxlength="200" placeholder="Andika bio yako"
-      style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px"></textarea>
-
-    <label for="editPhoto">Picha ya wasifu</label>
-    <input id="editPhoto" type="file" accept="image/*"
-      style="display:block;margin:12px 0">
-
-    <button class="primary" id="saveProfile" type="button">
-      Hifadhi Profile
-    </button>
-    <p id="profileStatus" role="status" aria-live="polite"></p>
-  </div>
-</section>
-
-</main>
-
-<footer>
-  Wussabook &copy; 2026 - Haki zote zimehifadhiwa.
-</footer>
-
-<script>
-  let selectedImage = "";
-
-  function showPage(pageId) {
-    document.querySelectorAll('.page-section').forEach(sec => {
-      sec.classList.remove('active-section');
-    });
-    document.getElementById(pageId).classList.add('active-section');
+<!DOCTYPE html>  <html lang="sw">    <head>    
+  <meta charset="UTF-8" />    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />    
+  <title>Wussabook</title>    
+  <style>    
+    :root {    
+      /* Instagram Light Theme */    
+      --bg: #fafafa;    
+      --card: #ffffff;    
+      --text: #262626;    
+      --text-secondary: #8e8e8e;    
+      --border: #dbdbdb;    
+      --primary: #0095f6;    
+      --primary-hover: #1877f2;    
+      --heart: #ed4956;    
+      --gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);    
+      --shadow: 0 1px 2px rgba(0,0,0,0.05);    
+    }  [data-theme="dark"] {    
+  --bg: #000000;    
+  --card: #121212;    
+  --text: #f5f5f5;    
+  --text-secondary: #a8a8a8;    
+  --border: #262626;    
+  --primary: #0095f6;    
+  --shadow: 0 1px 3px rgba(0,0,0,0.4);    
+}    - {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
 
-  function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        selectedImage = e.target.result;
-        document.getElementById('notice').innerText = "📷 Picha imechaguliwa!";
-      }
-      reader.readAsDataURL(file);
-    }
-  }
-
-
-  const WUSSABOOK_POSTS_KEY = "wussabook_posts_v1";
-
-
-  function savePostChanges(updatedPost) {
-    const posts = readSavedPosts();
-    const index = posts.findIndex(p => p.id === updatedPost.id);
-    if (index === -1) return false;
-
-    posts[index] = updatedPost;
-    try {
-      localStorage.setItem(WUSSABOOK_POSTS_KEY, JSON.stringify(posts));
-      return true;
-    } catch (error) {
-      alert("Imeshindikana kuhifadhi. Nafasi ya kifaa inaweza kuwa imejaa.");
-      return false;
-    }
-  }
-
-  function readSavedPosts() {
-    try {
-      const data = JSON.parse(
-        localStorage.getItem(WUSSABOOK_POSTS_KEY) || "[]"
-      );
-      if (!Array.isArray(data)) return [];
-
-      let changed = false;
-      data.forEach(post => {
-        if (!post.id) {
-          post.id = "post_" + Date.now() + "_" +
-            Math.random().toString(36).slice(2);
-          changed = true;
-        }
-        if (!Array.isArray(post.comments)) {
-          post.comments = [];
-          changed = true;
-        }
-        if (!Number.isFinite(post.likes)) {
-          post.likes = 0;
-          changed = true;
-        }
-        if (typeof post.liked !== "boolean") {
-          post.liked = false;
-          changed = true;
-        }
-      });
-
-      if (changed) {
-        try {
-          localStorage.setItem(WUSSABOOK_POSTS_KEY, JSON.stringify(data));
-        } catch (_) {}
-      }
-      return data;
-    } catch (error) {
-      return [];
-    }
-  }
-
-  function createSavedPost(post) {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const profile = document.createElement("div");
-    profile.className = "profile";
-
-    const avatar = document.createElement("div");
-    avatar.className = "avatar";
-    avatar.textContent = "W";
-
-    const identity = document.createElement("div");
-    const name = document.createElement("strong");
-    name.textContent = "WUSSA";
-
-    const date = document.createElement("div");
-    date.className = "muted";
-    date.textContent = post.date || "Hivi punde";
-
-    identity.append(name, date);
-    profile.append(avatar, identity);
-    card.append(profile);
-
-    const content = document.createElement("div");
-    content.className = "post-content";
-    content.textContent = post.text || "";
-    card.append(content);
-
-    if (post.photo) {
-      const img = document.createElement("img");
-      img.src = post.photo;
-      img.alt = "Picha ya chapisho";
-      img.className = "post-img";
-      card.append(img);
-    }
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    actions.style.borderTop = "1px solid #eee";
-    actions.style.paddingTop = "8px";
-
-    const like = document.createElement("button");
-    like.type = "button";
-    like.textContent = "👍 Penda (" + (post.likes || 0) + ")";
-    if (post.liked) like.style.color = "#1877f2";
-
-    like.addEventListener("click", function () {
-      const wasLiked = !!post.liked;
-      post.liked = !wasLiked;
-      post.likes = Math.max(0, (post.likes || 0) + (wasLiked ? -1 : 1));
-
-      if (!savePostChanges(post)) {
-        post.liked = wasLiked;
-        post.likes = Math.max(0, (post.likes || 0) + (wasLiked ? 1 : -1));
-        return;
-      }
-
-      like.textContent = "👍 Penda (" + post.likes + ")";
-      like.style.color = post.liked ? "#1877f2" : "";
-    });
-
-    const commentLabel = document.createElement("span");
-    commentLabel.textContent = "💬 Maoni (" +
-      (post.comments || []).length + ")";
-
-    const share = document.createElement("button");
-    share.type = "button";
-    share.textContent = "🔄 Shiriki";
-    share.addEventListener("click", async function () {
-      const text = (post.text || "") + (post.photo ? " [Picha]" : "");
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: "WUSSABOOK", text: text });
-        } else if (navigator.clipboard) {
-          await navigator.clipboard.writeText(text);
-          alert("Maandishi ya chapisho yamenakiliwa.");
-        } else {
-          alert(text || "Chapisho la WUSSABOOK");
-        }
-      } catch (_) {}
-    });
-
-    actions.append(like, commentLabel, share);
-    card.append(actions);
-
-    const commentsBox = document.createElement("div");
-    commentsBox.style.marginTop = "12px";
-
-    (post.comments || []).forEach(item => {
-      const line = document.createElement("p");
-      line.style.background = "#f0f2f5";
-      line.style.padding = "8px 10px";
-      line.style.borderRadius = "10px";
-      line.style.margin = "6px 0";
-      line.textContent = (item.text || "") +
-        (item.date ? " · " + item.date : "");
-      commentsBox.append(line);
-    });
-
-    const form = document.createElement("form");
-    form.style.display = "flex";
-    form.style.gap = "8px";
-    form.style.marginTop = "8px";
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = "Andika maoni...";
-    input.maxLength = 300;
-    input.required = true;
-    input.setAttribute("aria-label", "Andika maoni");
-    input.style.flex = "1";
-    input.style.minWidth = "0";
-    input.style.padding = "10px";
-    input.style.border = "1px solid #ddd";
-    input.style.borderRadius = "10px";
-
-    const send = document.createElement("button");
-    send.type = "submit";
-    send.textContent = "Tuma";
-
-    form.append(input, send);
-    commentsBox.append(form);
-    card.append(commentsBox);
-
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-      const value = input.value.trim();
-      if (!value) return;
-
-      const updated = Object.assign({}, post);
-      updated.comments = (post.comments || []).slice();
-      updated.comments.push({
-        text: value,
-        date: new Date().toLocaleString()
-      });
-
-      if (!savePostChanges(updated)) return;
-
-      const replacement = createSavedPost(updated);
-      card.replaceWith(replacement);
-    });
-
-    return card;
-  }
-  function loadSavedPosts() {
-    const postsDiv = document.getElementById("posts");
-    if (!postsDiv) return;
-
-    const posts = readSavedPosts();
-    for (let i = posts.length - 1; i >= 0; i--) {
-      postsDiv.prepend(createSavedPost(posts[i]));
-    }
-  }
-
-  function addPost() {
-    const textInput = document.getElementById("postText");
-    const text = textInput.value.trim();
-    const photo = selectedImage || "";
-
-    if (!text && !photo) {
-      alert("Tafadhali andika kitu au weka picha!");
-      return;
-    }
-
-    const postsDiv = document.getElementById("posts");
-    if (!postsDiv) return;
-
-    const posts = readSavedPosts();
-    posts.unshift({
-      id: "post_" + Date.now() + "_" + Math.random().toString(36).slice(2),
-      text: text,
-      photo: photo,
-      date: "Hivi punde",
-      likes: 0,
-      liked: false,
-      comments: []
-    });
-
-    try {
-      localStorage.setItem(WUSSABOOK_POSTS_KEY, JSON.stringify(posts));
-    } catch (error) {
-      alert("Chapisho halijahifadhiwa. Nafasi ya kuhifadhi inaweza kuwa imejaa; jaribu picha ndogo.");
-      return;
-    }
-
-    postsDiv.prepend(createSavedPost(posts[0]));
-    textInput.value = "";
-    selectedImage = "";
-    document.getElementById("notice").innerText = "";
-    document.getElementById("photo").value = "";
-  }
-
-  loadSavedPosts();
-
-
-const WUSSA_FRIENDS_KEY = "wussabook_friends_v1";
-
-function getWussaFriends() {
-  try {
-    const data = JSON.parse(
-      localStorage.getItem(WUSSA_FRIENDS_KEY) || "[]"
-    );
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    return [];
-  }
+body {
+background: var(--bg);
+color: var(--text);
+min-height: 100vh;
+transition: background 0.3s, color 0.3s;
 }
 
-function renderWussaFriends() {
-  const list = document.getElementById("friendList");
-  const search = document.getElementById("friendSearch");
-  if (!list) return;
-
-  const query = search ? search.value.trim().toLowerCase() : "";
-  const friends = getWussaFriends().filter(name =>
-    name.toLowerCase().includes(query)
-  );
-
-  list.replaceChildren();
-
-  if (friends.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "muted";
-    empty.textContent = query
-      ? "Hakuna rafiki anayelingana na utafutaji huo."
-      : "Bado hujaongeza rafiki.";
-    list.appendChild(empty);
-    return;
-  }
-
-  friends.forEach(name => {
-    const row = document.createElement("div");
-    row.style.cssText =
-      "display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee";
-
-    const label = document.createElement("span");
-    label.textContent = "👤 " + name;
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "Ondoa";
-    remove.addEventListener("click", () => {
-      const updated = getWussaFriends().filter(
-        friend => friend !== name
-      );
-      localStorage.setItem(
-        WUSSA_FRIENDS_KEY,
-        JSON.stringify(updated)
-      );
-      renderWussaFriends();
-    });
-
-    row.append(label, remove);
-    list.appendChild(row);
-  });
+/* ========== HEADER ========== */
+header {
+background: var(--card);
+border-bottom: 1px solid var(--border);
+position: sticky;
+top: 0;
+z-index: 100;
+padding: 10px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
 }
 
-function addWussaFriend() {
-  const input = document.getElementById("newFriendName");
-  const status = document.getElementById("friendStatus");
-  if (!input || !status) return;
-
-  const name = input.value.trim();
-
-  if (!name) {
-    status.textContent = "Andika jina kwanza.";
-    return;
-  }
-
-  const friends = getWussaFriends();
-
-  if (friends.some(friend =>
-    friend.toLowerCase() === name.toLowerCase()
-  )) {
-    status.textContent = "Jina hilo tayari lipo.";
-    return;
-  }
-
-  friends.push(name);
-  localStorage.setItem(
-    WUSSA_FRIENDS_KEY,
-    JSON.stringify(friends)
-  );
-
-  input.value = "";
-  status.textContent = "Rafiki ameongezwa kwenye orodha yako.";
-  renderWussaFriends();
+.logo {
+font-size: 26px;
+font-weight: 700;
+background: var(--gradient);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+cursor: pointer;
+letter-spacing: -0.5px;
 }
 
-document.addEventListener("DOMContentLoaded", renderWussaFriends);
+.header-right {
+display: flex;
+align-items: center;
+gap: 14px;
+}
 
-</script>
+.icon-btn {
+background: none;
+border: none;
+font-size: 22px;
+cursor: pointer;
+color: var(--text);
+position: relative;
+}
 
-<script id="WUSSABOOK_AUTH_UI">
-(function () {
-  const $ = id => document.getElementById(id);
-  const ACCOUNTS = "wussabook_demo_accounts_v1";
-  const SESSION = "wussabook_demo_session_v1";
+.profile-btn {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: var(--gradient);
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: 700;
+font-size: 14px;
+border: none;
+cursor: pointer;
+position: relative;
+}
 
-  window.authMode = function (mode) {
-    $("registerForm").hidden = mode !== "register";
-    $("loginForm").hidden = mode !== "login";
-    $("loggedIn").hidden = true;
-    $("authStatus").textContent = "";
-  };
+.blue-tick {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 15px;
+height: 15px;
+background: var(--primary);
+color: white;
+border-radius: 50%;
+font-size: 9px;
+font-weight: bold;
+margin-left: 3px;
+vertical-align: middle;
+}
 
-  function readAccounts() {
-    try {
-      return JSON.parse(localStorage.getItem(ACCOUNTS) || "{}");
-    } catch (_) {
-      return {};
-    }
-  }
+/* ========== NAV ========== */
+nav {
+display: flex;
+background: var(--card);
+border-bottom: 1px solid var(--border);
+position: sticky;
+top: 53px;
+z-index: 90;
+overflow-x: auto;
+scrollbar-width: none;
+}
 
-  async function hashPassword(password, salt) {
-    const data = new TextEncoder().encode(salt + ":" + password);
-    const digest = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(digest))
-      .map(b => b.toString(16).padStart(2, "0")).join("");
-  }
+nav::-webkit-scrollbar { display: none; }
 
-  function showUser(user) {
-    $("registerForm").hidden = true;
-    $("loginForm").hidden = true;
-    $("loggedIn").hidden = false;
-    $("welcomeName").textContent = "Umeingia kama " + user.name;
-    $("authStatus").textContent = "Umeingia kwenye akaunti ya majaribio.";
-  }
+nav button {
+flex: 1;
+min-width: 70px;
+padding: 12px 8px;
+border: none;
+background: transparent;
+color: var(--text-secondary);
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+position: relative;
+white-space: nowrap;
+}
 
-  $("registerForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+nav button.active {
+color: var(--text);
+}
 
-    if (!crypto.subtle) {
-      $("authStatus").textContent =
-        "Browser haijaruhusu cryptography. Fungua website kupitia localhost.";
-      return;
-    }
+nav button.active::after {
+content: "";
+position: absolute;
+bottom: 0;
+left: 20%;
+right: 20%;
+height: 2px;
+background: var(--text);
+}
 
-    const name = $("regName").value.trim();
-    const email = $("regEmail").value.trim().toLowerCase();
-    const password = $("regPass").value;
-    const confirm = $("regConfirm").value;
+/* ========== CONTAINER ========== */
+.container {
+max-width: 470px;
+margin: 0 auto;
+padding-bottom: 30px;
+}
 
-    if (password.length < 8) {
-      $("authStatus").textContent = "Nywila lazima iwe na angalau herufi 8.";
-      return;
-    }
+/* ========== STORIES / REELS ========== */
+.stories {
+background: var(--card);
+border-bottom: 1px solid var(--border);
+padding: 14px 12px;
+display: flex;
+gap: 14px;
+overflow-x: auto;
+scrollbar-width: none;
+}
 
-    if (password !== confirm) {
-      $("authStatus").textContent = "Nywila mbili hazifanani.";
-      return;
-    }
+.stories::-webkit-scrollbar { display: none; }
 
-    const accounts = readAccounts();
+.story {
+flex: 0 0 auto;
+width: 74px;
+text-align: center;
+cursor: pointer;
+}
 
-    if (accounts[email]) {
-      $("authStatus").textContent = "Barua pepe hii tayari imesajiliwa kwenye kifaa hiki.";
-      return;
-    }
+.story-ring {
+width: 66px;
+height: 66px;
+border-radius: 50%;
+padding: 3px;
+background: var(--gradient);
+margin: 0 auto 6px;
+}
 
-    const salt = crypto.randomUUID();
-    accounts[email] = {
-      name: name,
-      salt: salt,
-      hash: await hashPassword(password, salt)
-    };
+.story-ring.seen {
+background: var(--border);
+}
 
-    try {
-      localStorage.setItem(ACCOUNTS, JSON.stringify(accounts));
-      localStorage.setItem(SESSION, email);
-      $("registerForm").reset();
-      showUser(accounts[email]);
-    } catch (_) {
-      $("authStatus").textContent = "Hifadhi imeshindwa. Angalia nafasi ya browser.";
-    }
-  });
+.story-avatar {
+width: 100%;
+height: 100%;
+border-radius: 50%;
+background: var(--card);
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 700;
+font-size: 20px;
+border: 2px solid var(--card);
+overflow: hidden;
+}
 
-  $("loginForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+.story-avatar img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
 
-    const email = $("loginEmail").value.trim().toLowerCase();
-    const password = $("loginPass").value;
-    const accounts = readAccounts();
-    const user = accounts[email];
+.story-name {
+font-size: 12px;
+color: var(--text);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
 
-    if (!user || await hashPassword(password, user.salt) !== user.hash) {
-      $("authStatus").textContent = "Barua pepe au nywila si sahihi.";
-      return;
-    }
+/* ========== CREATE POST ========== */
+.create-post {
+background: var(--card);
+border-bottom: 1px solid var(--border);
+padding: 12px 16px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
 
-    localStorage.setItem(SESSION, email);
-    $("loginForm").reset();
-    showUser(user);
-  });
+.create-post input {
+flex: 1;
+border: 1px solid var(--border);
+background: var(--bg);
+border-radius: 20px;
+padding: 10px 16px;
+font-size: 14px;
+outline: none;
+color: var(--text);
+cursor: pointer;
+}
 
-  window.logoutDemo = function () {
-    localStorage.removeItem(SESSION);
-    $("loggedIn").hidden = true;
-    $("registerForm").hidden = true;
-    $("loginForm").hidden = false;
-    $("authStatus").textContent = "Umetoka kwenye akaunti.";
-  };
+/* ========== POST ========== */
+.post {
+background: var(--card);
+border-bottom: 1px solid var(--border);
+margin-bottom: 8px;
+}
 
-  const sessionEmail = localStorage.getItem(SESSION);
-  const savedUser = sessionEmail && readAccounts()[sessionEmail];
+.post-header {
+display: flex;
+align-items: center;
+padding: 12px 14px;
+gap: 10px;
+}
 
-  if (savedUser) {
-    showUser(savedUser);
-  } else {
-    authMode("register");
-  }
-})();
-</script>
+.post-avatar {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: var(--gradient);
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: 700;
+font-size: 15px;
+}
 
+.post-user {
+flex: 1;
+}
 
-<script id="WUSSABOOK_PROFILE_SCRIPT">
-(function () {
-  const $ = id => document.getElementById(id);
-  const KEY = "wussabook_profile_v1";
-  let photoData = "";
+.post-user .name {
+font-weight: 600;
+font-size: 14px;
+display: flex;
+align-items: center;
+}
 
-  function loadProfile() {
-    try {
-      const data = JSON.parse(localStorage.getItem(KEY) || "{}");
-      $("editName").value = data.name || "";
-      $("editBio").value = data.bio || "";
-      photoData = data.photo || "";
-      $("profileName").textContent = data.name || "WUSSA";
-      $("profileBio").textContent = data.bio || "Karibu kwenye WUSSABOOK!";
-      $("profilePhoto").src = photoData || "data:image/svg+xml," +
-        encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#1877f2"/><text x="50" y="68" font-size="55" text-anchor="middle" fill="white">W</text></svg>');
-    } catch (_) {}
-  }
+.post-user .time {
+font-size: 12px;
+color: var(--text-secondary);
+}
 
-  $("editPhoto").addEventListener("change", function () {
-    const file = this.files && this.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      $("profileStatus").textContent = "Chagua faili la picha.";
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      $("profileStatus").textContent = "Chagua picha yenye ukubwa chini ya 2 MB.";
-      this.value = "";
-      return;
-    }
+.more-btn {
+background: none;
+border: none;
+font-size: 18px;
+color: var(--text);
+cursor: pointer;
+}
 
-    const reader = new FileReader();
-    reader.onload = function () {
-      photoData = reader.result;
-      $("profilePhoto").src = photoData;
-    };
-    reader.readAsDataURL(file);
-  });
+.post-media {
+width: 100%;
+max-height: 580px;
+object-fit: cover;
+display: block;
+background: #000;
+}
 
-  $("saveProfile").addEventListener("click", function () {
-    const name = $("editName").value.trim();
-    const bio = $("editBio").value.trim();
+.post-actions {
+display: flex;
+align-items: center;
+padding: 10px 14px 6px;
+gap: 16px;
+}
 
-    if (!name) {
-      $("profileStatus").textContent = "Tafadhali andika jina lako.";
-      return;
-    }
+.post-actions button {
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: var(--text);
+padding: 0;
+}
 
-    try {
-      localStorage.setItem(KEY, JSON.stringify({
-        name: name,
-        bio: bio,
-        photo: photoData
-      }));
-      $("profileName").textContent = name;
-      $("profileBio").textContent = bio || "Karibu kwenye WUSSABOOK!";
-      $("profileStatus").textContent = "Profile imehifadhiwa kwenye kifaa hiki! 🔵";
-    } catch (_) {
-      $("profileStatus").textContent =
-        "Hifadhi imeshindwa. Jaribu picha ndogo au futa picha kisha uhifadhi tena.";
-    }
-  });
+.post-actions .liked {
+color: var(--heart);
+}
 
-  loadProfile();
-})();
-</script>
+.post-likes {
+padding: 0 14px 6px;
+font-weight: 600;
+font-size: 14px;
+}
 
-</body>
+.post-caption {
+padding: 0 14px 8px;
+font-size: 14px;
+line-height: 1.4;
+}
+
+.post-caption .username {
+font-weight: 600;
+margin-right: 6px;
+}
+
+.post-comments {
+padding: 0 14px 12px;
+font-size: 14px;
+color: var(--text-secondary);
+cursor: pointer;
+}
+
+/* ========== MODALS ========== */
+.modal {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.65);
+z-index: 200;
+align-items: flex-end;
+justify-content: center;
+}
+
+.modal.show {
+display: flex;
+}
+
+.modal-content {
+background: var(--card);
+width: 100%;
+max-width: 470px;
+border-radius: 16px 16px 0 0;
+padding: 20px;
+max-height: 90vh;
+overflow-y: auto;
+animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+from { transform: translateY(100%); }
+to { transform: translateY(0); }
+}
+
+.modal-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 18px;
+}
+
+.modal-header h2 {
+font-size: 18px;
+font-weight: 700;
+}
+
+.close-btn {
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: var(--text);
+}
+
+/* Account Modal */
+.account-info {
+text-align: center;
+padding: 10px 0 20px;
+}
+
+.big-avatar {
+width: 86px;
+height: 86px;
+border-radius: 50%;
+background: var(--gradient);
+margin: 0 auto 12px;
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-size: 34px;
+font-weight: 700;
+}
+
+.account-info h3 {
+font-size: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+}
+
+.verified-badge {
+display: inline-block;
+background: rgba(0,149,246,0.12);
+color: var(--primary);
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+margin-top: 8px;
+}
+
+.menu-list {
+list-style: none;
+}
+
+.menu-list li {
+padding: 14px 0;
+border-bottom: 1px solid var(--border);
+display: flex;
+align-items: center;
+gap: 12px;
+cursor: pointer;
+font-size: 15px;
+font-weight: 500;
+}
+
+.menu-list li:last-child {
+border-bottom: none;
+color: #ed4956;
+}
+
+/* Create Post Modal */
+.create-modal textarea {
+width: 100%;
+min-height: 110px;
+border: none;
+outline: none;
+font-size: 16px;
+resize: none;
+background: transparent;
+color: var(--text);
+margin: 12px 0;
+}
+
+.media-preview {
+margin: 10px 0;
+border-radius: 10px;
+overflow: hidden;
+display: none;
+}
+
+.media-preview img,
+.media-preview video {
+width: 100%;
+max-height: 260px;
+object-fit: cover;
+}
+
+.create-actions-row {
+display: flex;
+gap: 10px;
+margin-bottom: 16px;
+}
+
+.create-actions-row button {
+flex: 1;
+padding: 10px;
+border: 1px solid var(--border);
+border-radius: 8px;
+background: var(--bg);
+color: var(--text);
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+}
+
+.submit-post {
+width: 100%;
+background: var(--primary);
+color: white;
+border: none;
+padding: 13px;
+border-radius: 10px;
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+}
+
+.submit-post:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 14px 0;
+border-bottom: 1px solid var(--border);
+font-weight: 500;
+}
+
+.switch {
+position: relative;
+width: 46px;
+height: 26px;
+}
+
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+
+.slider {
+position: absolute;
+cursor: pointer;
+inset: 0;
+background: #ccc;
+border-radius: 26px;
+transition: 0.3s;
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 20px;
+width: 20px;
+left: 3px;
+bottom: 3px;
+background: white;
+border-radius: 50%;
+transition: 0.3s;
+}
+
+input:checked + .slider {
+background: var(--primary);
+}
+
+input:checked + .slider:before {
+transform: translateX(20px);
+}
+
+/* Empty state */
+.empty {
+text-align: center;
+padding: 40px 20px;
+color: var(--text-secondary);
+}
+
+  </style>    
+</head>    
+<body>    <!-- HEADER -->    <header>    
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">Wussabook</div>    
+    <div class="header-right">    
+      <button class="icon-btn" onclick="openCreatePost()" title="New Post">➕</button>    
+      <button class="icon-btn" title="Messages">💬</button>    
+      <button class="icon-btn" title="Notifications">❤️</button>    
+      <button class="profile-btn" onclick="openAccountMenu()">W</button>    
+    </div>    
+  </header>    <!-- NAV -->    <nav>    
+    <button class="active" onclick="setActive(this)">🏠 Home</button>    
+    <button onclick="setActive(this)">🎬 Reels</button>    
+    <button onclick="setActive(this)">📹 Videos</button>    
+    <button onclick="setActive(this)">👥 Friends</button>    
+    <button onclick="setActive(this)">🛒 Shop</button>    
+  </nav>    <div class="container">  <!-- STORIES -->    
+<div class="stories" id="stories">    
+  <!-- Generated by JS -->    
+</div>    <!-- CREATE POST BAR -->    <div class="create-post">    
+  <div class="post-avatar">W</div>    
+  <input type="text" placeholder="Unawaza nini?" readonly onclick="openCreatePost()" />    
+</div>    <!-- FEED -->    <div id="feed"></div>    </div>    <!-- ACCOUNT MODAL -->    <div class="modal" id="accountModal">    
+    <div class="modal-content">    
+      <div class="modal-header">    
+        <h2>Akaunti Yako</h2>    
+        <button class="close-btn" onclick="closeModal('accountModal')">✕</button>    
+      </div>  <div class="account-info">    
+    <div class="big-avatar">W</div>    
+    <h3>Wewe <span class="blue-tick">✓</span></h3>    
+    <div class="verified-badge">✓ Verified • Blue Tick ya Kudumu</div>    
+    <p style="color:var(--text-secondary);margin-top:6px;font-size:14px;">@wussa</p>    
+  </div>      <div class="theme-toggle">    
+    <span>🌙 Dark Mode</span>    
+    <label class="switch">    
+      <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">    
+      <span class="slider"></span>    
+    </label>    
+  </div>      <ul class="menu-list">    
+    <li>👤 Profile Yako</li>    
+    <li>📊 Insights</li>    
+    <li>⚙️ Settings</li>    
+    <li>🔔 Notifications</li>    
+    <li>💬 Messages</li>    
+    <li>🚪 Log Out</li>    
+  </ul>    
+</div>    </div>    <!-- CREATE POST MODAL -->    <div class="modal" id="createModal">    
+    <div class="modal-content">    
+      <div class="modal-header">    
+        <h2>Post Mpya</h2>    
+        <button class="close-btn" onclick="closeModal('createModal')">✕</button>    
+      </div>  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">    
+    <div class="post-avatar">W</div>    
+    <div>    
+      <strong>Wewe <span class="blue-tick">✓</span></strong>    
+      <div style="font-size:12px;color:var(--text-secondary);">Public</div>    
+    </div>    
+  </div>      <textarea id="postText" placeholder="Andika kitu..."></textarea>      <div class="media-preview" id="mediaPreview"></div>      <input type="file" id="mediaInput" accept="image/*,video/*" hidden onchange="previewMedia(event)">      <div class="create-actions-row">    
+    <button onclick="document.getElementById('mediaInput').click()">🖼️ Picha / Video</button>    
+  </div>    <button class="submit-post" onclick="submitPost()">Chapisha</button>
+
+</div>    </div>    <script>    
+    // ========== DATA ==========    
+    const currentUser = {    
+      id: "me",    
+      name: "Wewe",    
+      username: "wussa",    
+      avatar: "W",    
+      verified: true,    
+      followers: 125000    
+    };    const users = [    
+  currentUser,    
+  { id: "u1", name: "Amina", username: "amina", avatar: "A", verified: true, followers: 45200 },    
+  { id: "u2", name: "John", username: "johnd", avatar: "J", verified: false, followers: 3200 },    
+  { id: "u3", name: "Star", username: "tikstar", avatar: "T", verified: true, followers: 890000 },    
+  { id: "u4", name: "Creator", username: "local", avatar: "L", verified: false, followers: 8500 },    
+  { id: "u5", name: "NewsTZ", username: "newstz", avatar: "N", verified: true, followers: 210000 }    
+];    
+
+let posts = JSON.parse(localStorage.getItem("wussabook_posts_v2")) || [    
+  {    
+    id: 1,    
+    userId: "me",    
+    text: "Karibu kwenye Wussabook toleo jipya! 🔥 Rangi mpya kama Instagram + Blue Tick",    
+    media: null,    
+    type: "text",    
+    likes: 156,    
+    comments: 28,    
+    time: "2h",    
+    liked: false    
+  },    
+  {    
+    id: 2,    
+    userId: "u1",    
+    text: "Sunset vibes leo 🌅",    
+    media: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",    
+    type: "image",    
+    likes: 1240,    
+    comments: 89,    
+    time: "5h",    
+    liked: false    
+  },    
+  {    
+    id: 3,    
+    userId: "u3",    
+    text: "New reel dropping soon 💃 Who is ready?",    
+    media: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800",    
+    type: "image",    
+    likes: 8900,    
+    comments: 412,    
+    time: "1d",    
+    liked: true    
+  },    
+  {    
+    id: 4,    
+    userId: "u5",    
+    text: "Teknolojia inaendelea kubadilisha Tanzania 🇹🇿 #Innovation",    
+    media: null,    
+    type: "text",    
+    likes: 3400,    
+    comments: 210,    
+    time: "3h",    
+    liked: false    
+  }    
+];    
+
+const stories = [    
+  { id: "me", name: "Your Story", avatar: "W", verified: true, seen: false },    
+  { id: "u1", name: "Amina", avatar: "A", verified: true, seen: false },    
+  { id: "u3", name: "Star", avatar: "T", verified: true, seen: true },    
+  { id: "u5", name: "NewsTZ", avatar: "N", verified: true, seen: false },    
+  { id: "u2", name: "John", avatar: "J", verified: false, seen: true },    
+  { id: "u4", name: "Creator", avatar: "L", verified: false, seen: false }    
+];    
+
+// ========== HELPERS ==========    
+function getUser(id) {    
+  return users.find(u => u.id === id) || currentUser;    
+}    
+
+function hasBlueTick(user) {    
+  return user.verified || user.followers >= 10000;    
+}    
+
+function renderTick(user) {    
+  return hasBlueTick(user) ? `<span class="blue-tick">✓</span>` : "";    
+}    
+
+// ========== RENDER ==========    
+function renderStories() {    
+  const el = document.getElementById("stories");    
+  el.innerHTML = stories.map(s => `    
+    <div class="story">    
+      <div class="story-ring ${s.seen ? 'seen' : ''}">    
+        <div class="story-avatar">${s.avatar}</div>    
+      </div>    
+      <div class="story-name">${s.name}</div>    
+    </div>    
+  `).join("");    
+}    
+
+function renderFeed() {    
+  const feed = document.getElementById("feed");    
+  if (posts.length === 0) {    
+    feed.innerHTML = `<div class="empty">Hakuna posts bado.<br>Tengeneza ya kwanza!</div>`;    
+    return;    
+  }    
+
+  feed.innerHTML = posts.map(post => {    
+    const user = getUser(post.userId);    
+    const media = post.media    
+      ? (post.type === "video"    
+          ? `<video class="post-media" controls src="${post.media}"></video>`    
+          : `<img class="post-media" src="${post.media}" alt="media" loading="lazy" />`)    
+      : "";    
+
+    return `    
+      <article class="post">    
+        <div class="post-header">    
+          <div class="post-avatar">${user.avatar}</div>    
+          <div class="post-user">    
+            <div class="name">${user.name} ${renderTick(user)}</div>    
+            <div class="time">${post.time}</div>    
+          </div>    
+          <button class="more-btn">⋯</button>    
+        </div>    
+
+        ${media}    
+
+        <div class="post-actions">    
+         <button class="${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">    
+            ${post.liked ? "❤️" : "🤍"}    
+          </button>    
+          <button>💬</button>    
+          <button>➤</button>    
+          <button style="margin-left:auto">🔖</button>    
+        </div>    
+
+        <div class="post-likes">${post.likes.toLocaleString()} likes</div>    
+
+        <div class="post-caption">    
+         <span class="username">${user.username}</span> ${post.text}
+        </div>    
+
+        ${post.comments > 0 ? `<div class="post-comments">View all ${post.comments} comments</div>` : ""}    
+      </article>    
+    `;    
+  }).join("");    
+}    
+
+// ========== ACTIONS ==========    
+function toggleLike(id) {    
+  const post = posts.find(p => p.id === id);    
+  if (!post) return;    
+  post.liked = !post.liked;    
+  post.likes += post.liked ? 1 : -1;    
+  savePosts();    
+  renderFeed();    
+}    
+
+function savePosts() {    
+  localStorage.setItem("wussabook_posts_v2", JSON.stringify(posts));    
+}    
+
+function setActive(btn) {    
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));    
+  btn.classList.add("active");    
+}    
+
+function openAccountMenu() {    
+  document.getElementById("accountModal").classList.add("show");    
+}    
+
+function openCreatePost() {    
+  document.getElementById("createModal").classList.add("show");    
+  document.getElementById("postText").focus();    
+}    
+
+function closeModal(id) {    
+  document.getElementById(id).classList.remove("show");    
+  if (id === "createModal") {    
+    document.getElementById("postText").value = "";    
+    document.getElementById("mediaPreview").style.display = "none";    
+    document.getElementById("mediaPreview").innerHTML = "";    
+    document.getElementById("mediaInput").value = "";    
+    selectedMedia = null;    
+    selectedType = "text";    
+  }    
+}    
+
+let selectedMedia = null;    
+let selectedType = "text";    
+
+function previewMedia(e) {    
+  const file = e.target.files[0];    
+  if (!file) return;    
+
+  const url = URL.createObjectURL(file);    
+  selectedMedia = url;    
+  selectedType = file.type.startsWith("video/") ? "video" : "image";    
+
+  const preview = document.getElementById("mediaPreview");    
+  preview.style.display = "block";    
+  preview.innerHTML = selectedType === "video"    
+    ? `<video src="${url}" controls></video>`    
+    : `<img src="${url}" alt="preview" />`;    
+}    
+
+function submitPost() {    
+  const text = document.getElementById("postText").value.trim();    
+  if (!text && !selectedMedia) {    
+    alert("Andika kitu au ongeza picha/video");    
+    return;    
+  }    
+
+  posts.unshift({    
+    id: Date.now(),    
+    userId: "me",    
+    text: text || "",    
+    media: selectedMedia,    
+    type: selectedType,    
+    likes: 0,    
+    comments: 0,    
+    time: "Just now",    
+    liked: false    
+  });    
+
+  savePosts();    
+  renderFeed();    
+  closeModal("createModal");    
+}    
+
+// Theme    
+function toggleTheme() {    
+  const isDark = document.getElementById("themeSwitch").checked;    
+  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");    
+  localStorage.setItem("wussabook_theme", isDark ? "dark" : "light");    
+}    
+
+// Close modal on outside click    
+document.querySelectorAll(".modal").forEach(modal => {    
+  modal.addEventListener("click", e => {    
+    if (e.target === modal) closeModal(modal.id);    
+  });    
+});    
+
+// ========== INIT ==========    
+function init() {    
+  const savedTheme = localStorage.getItem("wussabook_theme");    
+  if (savedTheme === "dark") {    
+    document.documentElement.setAttribute("data-theme", "dark");    
+    document.getElementById("themeSwitch").checked = true;    
+  }    
+  renderStories();    
+  renderFeed();    
+}    
+
+init();
+
+</script>  </body>
+
 </html>
