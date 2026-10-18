@@ -1,0 +1,17 @@
+{
+  "name": "WUSSABOOK",
+  "short_name": "WUSSA",
+  "description": "Unganisha watu na marafiki kupitia WUSSABOOK",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#1877f2",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
